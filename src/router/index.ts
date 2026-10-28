@@ -1,23 +1,31 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import type { RouteRecordRaw } from 'vue-router';
+import { aguardarUsuario } from '@/services/auth';
 
-import HomePage from '../views/HomePage.vue';
-
-const routes: RouteRecordRaw[] = [
+const rotas: Array<RouteRecordRaw> = [
+  { path: '/', redirect: '/login' },
+  { path: '/login', component: () => import('@/views/LoginPage.vue'), meta: { soDeslogado: true } },
+  { path: '/cadastro', component: () => import('@/views/CadastroPage.vue'), meta: { soDeslogado: true } },
   {
-    path: '/',
-    redirect: '/home',
+    path: '/recuperar-senha',
+    component: () => import('@/views/RecuperarSenhaPage.vue'),
+    meta: { soDeslogado: true },
   },
-  {
-    path: '/home',
-    name: 'Home',
-    component: HomePage,
-  },
+  { path: '/bem-vindo', component: () => import('@/views/BemVindoPage.vue'), meta: { exigeLogin: true } },
+  { path: '/perfil', component: () => import('@/views/PerfilPage.vue'), meta: { exigeLogin: true } },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes: rotas,
+});
+
+router.beforeEach(async (destino) => {
+  const usuario = await aguardarUsuario();
+
+  if (destino.meta.exigeLogin && !usuario) return '/login';
+  if (destino.meta.soDeslogado && usuario) return '/bem-vindo';
+  return true;
 });
 
 export default router;
