@@ -1,0 +1,7 @@
+{
+  "name": "firebase_pratica",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
